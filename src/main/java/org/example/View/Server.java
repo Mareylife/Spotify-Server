@@ -46,20 +46,26 @@ public class Server {
             while (true)
             {
                 Request request = Exchange.getInstance().read(client);
-                if (request.getAction() == RequestType.Logout) {
+                if (request.getAction() == RequestType.Logout)
+                {
                     System.out.println("(" + client + ") is out!");
                     break;
                 }
-                else if (request.getAction() == RequestType.Play) {
-//                    TODO: smt
-                }
-                else
+                else if (request.getAction() == RequestType.Play)
                 {
                     try {
-                        Exchange.getInstance().send(Processor.getInstance().process(request, client), client);
+                        Processor.getInstance().Play(request, client);
                     } catch (URISyntaxException e) {
                         throw new RuntimeException(e);
                     } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else if (request.getAction() == RequestType.ReFresh)
+                {
+                    try {
+                        Exchange.getInstance().send(Processor.getInstance().Refresh(request), client);
+                    } catch (URISyntaxException e) {
                         throw new RuntimeException(e);
                     }
                 }

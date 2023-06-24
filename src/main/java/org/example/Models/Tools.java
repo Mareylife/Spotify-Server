@@ -23,17 +23,10 @@ public class Tools {
     }
 
     public synchronized void sendMusic(Socket socket, String name) throws IOException, URISyntaxException {
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-        File file = new File(
+        File song = new File(
                 Tools.class.getResource("/musics/" + name).toURI()
         );
-        FileInputStream fileInputStream = new FileInputStream(file);
-
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-
-        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
+        FileTransferProcessor f = new FileTransferProcessor(socket);
+        f.sendFile(song);
     }
 }

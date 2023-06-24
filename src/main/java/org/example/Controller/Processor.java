@@ -21,39 +21,26 @@ public class Processor {
         return processor;
     }
 
-    public Response process(Request request, Socket client) throws URISyntaxException, IOException {
-        Response response = new Response();
-        if (request.getAction() == RequestType.ReFresh) {
-            response = Refresh(request);
-        }
-        else if (request.getAction() == RequestType.Play) {
-            response = Play(request, client);
-        }
-
-        return response;
-    }
-
-    private Response Refresh(Request request) throws URISyntaxException {
+    public Response Refresh(Request request) throws URISyntaxException {
         Response response = new Response();
         response.setStatus_code(200);
         response.setMessage(new Gson().toJson(getAllSongs()));
         return response;
     }
 
-    private Response Play(Request request, Socket client) throws URISyntaxException, IOException {
+    public void Play(Request request, Socket client) throws URISyntaxException, IOException {
         Response response = new Response();
         String name = (String) request.getParams().get("name");
         if (!getAllSongs().contains(name)) {
             response.setStatus_code(404);
             response.setMessage("not found!");
-            return response;
+            return;
         }
-//        TODO: smt
-        response.setStatus_code(200);
-        return response;
+        Tools.getInstance().sendMusic(client, name);
+        client.close();
     }
 
-    ArrayList<String> getAllSongs() {
+    private ArrayList<String> getAllSongs() {
         File folder = null;
         try {
             folder = new File( getClass().getResource("/musics/").toURI());
