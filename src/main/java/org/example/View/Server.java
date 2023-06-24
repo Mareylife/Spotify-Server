@@ -1,13 +1,16 @@
 package org.example.View;
 
-import Models.Request;
+
 import org.example.Controller.Connection;
 import org.example.Controller.Exchange;
 import org.example.Controller.Processor;
+import org.example.Models.Request;
 import org.example.Models.RequestType;
+import org.example.Models.Tools;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
 public class Server {
 
@@ -47,7 +50,19 @@ public class Server {
                     System.out.println("(" + client + ") is out!");
                     break;
                 }
-                Exchange.getInstance().send(Processor.getInstance().process(request), client);
+                else if (request.getAction() == RequestType.Play) {
+//                    TODO: smt
+                }
+                else
+                {
+                    try {
+                        Exchange.getInstance().send(Processor.getInstance().process(request, client), client);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }).start();
     }

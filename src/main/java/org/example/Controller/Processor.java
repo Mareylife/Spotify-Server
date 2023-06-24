@@ -1,10 +1,15 @@
 package org.example.Controller;
 
 import com.google.gson.Gson;
-import org.example.Models.Response;
+import org.example.Models.*;
 
+import java.io.*;
+import java.net.Socket;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
+
+import org.example.Models.Response;
+import org.example.Models.Tools;
 
 public class Processor {
     private static Processor processor;
@@ -16,48 +21,53 @@ public class Processor {
         return processor;
     }
 
-    public Response process(Models.Request request) {
+    public Response process(Request request, Socket client) throws URISyntaxException, IOException {
         Response response = new Response();
-//        if (request.getAction() == RequestType.Login) {
-//            response = Login(request);
-//        } else if (request.getAction() == RequestType.Register) {
-//            response = Register(request);
-//        } else if (request.getAction() == RequestType.ShowProfile) {
-//            response = ShowProfile(request);
-//        } else if (request.getAction() == RequestType.AllAdvertising) {
-//            response = getAllAdvertising(request);
-//        } else if (request.getAction() == RequestType.FavoriteAdvertising) {
-//            response = getAllFavoritesAdvertising(request);
-//        } else if (request.getAction() == RequestType.search) {
-//            response = search(request);
-//        } else if (request.getAction() == RequestType.addFavorite) {
-//            response = addFavorite(request);
-//        } else if (request.getAction() == RequestType.RemoveFavorite) {
-//            response = RemoveFavorite(request);
-//        } else if (request.getAction() == RequestType.AllAdvertisingInAscendingOrder) {
-//            response = AllAdvertisingInAscendingPriceOrder(request);
-//        } else if (request.getAction() == RequestType.AllAdvertisingInDeAscendingOrder) {
-//            response = AllAdvertisingInDeAscendingPriceOrder(request);
-//        } else if (request.getAction() == RequestType.NewAdvertising) {
-//            response = AddNewAdvertising(request);
-//        } else if (request.getAction() == RequestType.getAdvertise) {
-//            response = getAdvertise(request);
-//        } else if (request.getAction() == RequestType.AdvertisingInRange) {
-//            response = getInRange(request);
-//        } else if (request.getAction() == RequestType.ChangeUsername) {
-//            response = changeUserName(request);
-//        } else if (request.getAction() == RequestType.ChangePassword) {
-//            response = changePassword(request);
-//        } else if (request.getAction() == RequestType.ChangeProfilePhoto) {
-//            response = changeProfilePhoto(request);
-//        } else if (request.getAction() == RequestType.ChangeEmail) {
-//            response = changeEmail(request);
-//        } else if (request.getAction() == RequestType.ChangeFirstName) {
-//            response = changeFirstName(request);
-//        } else if (request.getAction() == RequestType.ChangeLastName) {
-//            response = changeLastName(request);
-//        }
+        if (request.getAction() == RequestType.ReFresh) {
+            response = Refresh(request);
+        }
+        else if (request.getAction() == RequestType.Play) {
+            response = Play(request, client);
+        }
 
         return response;
+    }
+
+    private Response Refresh(Request request) throws URISyntaxException {
+        Response response = new Response();
+        response.setStatus_code(200);
+        response.setMessage(new Gson().toJson(getAllSongs()));
+        return response;
+    }
+
+    private Response Play(Request request, Socket client) throws URISyntaxException, IOException {
+        Response response = new Response();
+        String name = (String) request.getParams().get("name");
+        if (!getAllSongs().contains(name)) {
+            response.setStatus_code(404);
+            response.setMessage("not found!");
+            return response;
+        }
+//        TODO: smt
+        response.setStatus_code(200);
+        return response;
+    }
+
+    ArrayList<String> getAllSongs() {
+        File folder = null;
+        try {
+            folder = new File( getClass().getResource("/musics/").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        File[] files = folder.listFiles();
+
+        ArrayList<String> res = new ArrayList<>();
+        for (File file : files) {
+            if (file.isFile()) {
+                res.add(file.getName());
+            }
+        }
+        return res;
     }
 }

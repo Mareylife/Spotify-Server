@@ -1,5 +1,5 @@
 package org.example.Models;
 
 public enum RequestType {
-    Logout, Any
+    Logout, ReFresh, Play
 }

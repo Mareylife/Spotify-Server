@@ -1,4 +1,4 @@
-package Models;
+package org.example.Models;
 
 import org.example.Models.RequestType;
 

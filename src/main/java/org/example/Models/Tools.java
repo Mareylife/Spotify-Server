@@ -1,15 +1,12 @@
 package org.example.Models;
 
 import com.google.gson.Gson;
-import org.example.Server;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Base64;
 
 public class Tools {
     private static Tools tools;
@@ -20,28 +17,23 @@ public class Tools {
         return tools;
     }
 
-    public Models.Request gsonToRequest(String gson) {
-        Models.Request request = new Gson().fromJson(gson, Models.Request.class);
+    public Request gsonToRequest(String gson) {
+        Request request = new Gson().fromJson(gson, Request.class);
         return request;
     }
 
-    public void sendMusic(ServerSocket serverSocket, Socket socket) throws IOException, URISyntaxException {
-        OutputStream outputStream = socket.getOutputStream();
+    public synchronized void sendMusic(Socket socket, String name) throws IOException, URISyntaxException {
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
         File file = new File(
-                Server.class.getResource("/music/music.mp3").toURI()
+                Tools.class.getResource("/musics/" + name).toURI()
         );
         FileInputStream fileInputStream = new FileInputStream(file);
 
-        byte[] buffer = new byte[4096]; // 4 KB buffer
+        byte[] buffer = new byte[4096];
         int bytesRead;
 
         while ((bytesRead = fileInputStream.read(buffer)) != -1) {
             outputStream.write(buffer, 0, bytesRead);
         }
-
-        fileInputStream.close();
-        outputStream.close();
-        socket.close();
-        serverSocket.close();
     }
 }
