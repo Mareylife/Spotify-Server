@@ -24,7 +24,6 @@ public class FileTransferProcessor {
         try {
             is = socket.getInputStream();
             bufferSize = socket.getReceiveBufferSize();
-            System.out.println("Buffer size: " + bufferSize);
             fos = new FileOutputStream(fileName);
             bos = new BufferedOutputStream(fos);
             byte[] bytes = new byte[bufferSize];
